@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'neato-game'
+package_name = 'neato_game'
 
 setup(
     name=package_name,
