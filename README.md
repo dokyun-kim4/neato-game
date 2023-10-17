@@ -1,1 +1,1 @@
-![neato-game](img/logo.png)
+![neato-game](img/project-logo.png)
