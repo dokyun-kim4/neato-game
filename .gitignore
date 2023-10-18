@@ -4,3 +4,4 @@ __pycache__
 # Testing files
 neato_game/b.py
 neato_game/b.ipynb
+neato_game/yolov8n-pose.pt
