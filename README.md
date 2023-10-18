@@ -1,4 +1,7 @@
-![neato_game](img/project-logo.png)
+<p align="center">
+  <img src="img/project-logo.png" />
+</p>
+
 # Computational Introduction to Robotics: Computer Vision Project
 ### Authors: Dokyun Kim & [Dominic Salmieri](https://github.com/joloujo)
 <br>
