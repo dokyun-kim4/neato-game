@@ -26,7 +26,7 @@ while True:
 
 
     # Feed frame into YOLO model
-    results = model(frame)
+    results = model(frame,verbose=False)
     attr = results[0]
     boxes = attr.boxes.cpu().numpy()
     xyxys = boxes.xyxy
