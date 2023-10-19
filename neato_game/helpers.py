@@ -44,5 +44,27 @@ def is_moving(prev_box_coord,crnt_box_coord):
 
     return False
 
+def get_com(points):
+    """
+    Calculate center of mass given a list of points.
 
+    Args:
+        points: list of points represented as a list
+
+    Returns:
+        center of mass
+    """
+    points = list(points)
+    for i,point in enumerate((points)):
+        if point[0] == 0 and point[1] == 0:
+            points.pop(i)
+    xsum = 0
+    ysum = 0
+    count = len(points)
+
+    for point in points:
+        xsum += point[0]
+        ysum += point[1]
+
+    return (int(xsum//count),int(ysum//count))
 
