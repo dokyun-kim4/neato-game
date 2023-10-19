@@ -1,16 +1,21 @@
 import cv2 as cv
 from ultralytics import YOLO
-from is_moving import is_moving
+from helpers import is_moving, get_com
 import time
 from playsound import playsound
+import numpy as np
+from sort import Sort
 
 # Load YOLO model
 model = YOLO('yolov8n-pose.pt')
 red = 10
 radius = 5  # Radius of the circle
 thickness = -1  # Thickness -1 fills the circle
-
+colors = np.random.uniform(0,255,size=(100,3))
 prev_boxes = []
+
+sort = Sort()
+    
 
 # Start camera
 cap = cv.VideoCapture(0)
@@ -20,8 +25,10 @@ if not cap.isOpened():
     print("Error: Unable to access the camera.")
     exit()
 
-time.sleep(1)
+time.sleep(0.5)
 while True:
+    xsum = 0
+    ysum = 0
     # Read a frame from the camera
     ret, frame = cap.read()
 
@@ -35,29 +42,55 @@ while True:
     results = model(frame,verbose=False)
     attr = results[0]
     boxes = attr.boxes.cpu().numpy()
-    xyxys = boxes.xyxy
+    xyxys = list(boxes.xyxy)
+    confs = boxes.conf
 
-    keypoints = attr.keypoints.xy.cpu().numpy()[0]
+    for i,xyxy in enumerate(xyxys):
+        xyxy = list(xyxy)
+        xyxy.append(confs[i])
+        xyxys[i] = xyxy
+    
+    if len(xyxys) == 0:
+        tracks = sort.update()
+    else:
+        tracks = sort.update(np.array(xyxys))
 
-    i = 0
-    color = [(0,0,255),(255,0,0),(0,255,0)]
-    # Draw bounding box
-    for xyxy in xyxys:
-        cv.rectangle(frame,(int(xyxy[0]),int(xyxy[1])),(int(xyxy[2]),int(xyxy[3])),color[i])
-        cv.putText(frame,str((int(xyxy[0]),int(xyxy[1]))),(int(xyxy[0]),int(xyxy[1])),cv.FONT_HERSHEY_PLAIN, 1, (255,200,180), 2)
-        i += 1
+ 
 
-    # Draw keypoints
-    for i,point in enumerate(keypoints):
-        cv.circle(frame, (int(point[0]), int(point[1])), radius, (0,0,red), thickness)
-        cv.putText(frame,str(i),(int(point[0]),int(point[1])),cv.FONT_HERSHEY_PLAIN, 2, (255,180,180), 2)
-        red += 30
+    # # Draw bounding box (YOLOv8)
+    # i = 0
+    # color = [(0,0,255),(255,0,0),(0,255,0)]
+    # for xyxy in xyxys:
+    #     cv.rectangle(frame,(int(xyxy[0]),int(xyxy[1])),(int(xyxy[2]),int(xyxy[3])),color[i])
+    #     cv.putText(frame,str((int(xyxy[0]),int(xyxy[1]))),(int(xyxy[0]),int(xyxy[1])),cv.FONT_HERSHEY_PLAIN, 1, (255,200,180), 2)
+    #     i += 1
+
+    for track in tracks:
+        x1,y1,x2,y2,track_id = int(track[0]),int(track[1]),int(track[2]),int(track[3]),int(track[4])
+        cv.rectangle(frame,(x1,y1),(x2,y2),colors[track_id],2)
+        cv.putText(frame,str(track_id),(x1+10,y1+40), cv.FONT_HERSHEY_PLAIN,3,colors[track_id],2)
+
+
+    # keypoints = attr.keypoints.xy.cpu().numpy()[0]
+    # # Draw keypoints
+    # for i,point in enumerate(keypoints):
+    #     cv.circle(frame, (int(point[0]), int(point[1])), radius, (0,0,red), thickness)
+    #     cv.putText(frame,str(i),(int(point[0]),int(point[1])),cv.FONT_HERSHEY_PLAIN, 2, (255,180,180), 2)
+    #     xsum += int(point[0])
+    #     ysum += int(point[1])
+    #     red += 30
+    
+
+
+    # cv.circle(frame,get_com(keypoints),radius,(0,0,0), thickness)
     cv.imshow('Webcam Feed', frame)
-    if len(prev_boxes) != 0:
-        if is_moving(prev_boxes[0],xyxys[0]):
-            # time.sleep(0.1)
-            print("MOVEMENT DETECTED")
-            playsound('playerOut.mp3')
+
+
+    # if len(prev_boxes) != 0:
+    #     if is_moving(prev_boxes[0],xyxys[0]):
+    #         time.sleep(0.5)
+    #         print("MOVEMENT DETECTED")
+    #         playsound('playerOut.mp3')
 
     prev_boxes = xyxys
 
