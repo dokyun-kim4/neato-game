@@ -1,10 +1,10 @@
 import cv2 as cv
 from ultralytics import YOLO
-from helpers import is_moving, get_com
+from helpers import is_moving, get_com, player_out
 import time
-from playsound import playsound
 import numpy as np
 from sort import Sort
+import threading
 
 # Load YOLO model
 model = YOLO('yolov8n-pose.pt')
@@ -15,7 +15,8 @@ colors = np.random.uniform(0,255,size=(100,3))
 prev_boxes = []
 
 sort = Sort()
-    
+
+
 
 # Start camera
 cap = cv.VideoCapture(0)
@@ -55,16 +56,8 @@ while True:
     else:
         tracks = sort.update(np.array(xyxys))
 
- 
 
-    # # Draw bounding box (YOLOv8)
-    # i = 0
-    # color = [(0,0,255),(255,0,0),(0,255,0)]
-    # for xyxy in xyxys:
-    #     cv.rectangle(frame,(int(xyxy[0]),int(xyxy[1])),(int(xyxy[2]),int(xyxy[3])),color[i])
-    #     cv.putText(frame,str((int(xyxy[0]),int(xyxy[1]))),(int(xyxy[0]),int(xyxy[1])),cv.FONT_HERSHEY_PLAIN, 1, (255,200,180), 2)
-    #     i += 1
-
+    # # Draw bounding box (SORT)
     for track in tracks:
         x1,y1,x2,y2,track_id = int(track[0]),int(track[1]),int(track[2]),int(track[3]),int(track[4])
         cv.rectangle(frame,(x1,y1),(x2,y2),colors[track_id],2)
@@ -86,11 +79,12 @@ while True:
     cv.imshow('Webcam Feed', frame)
 
 
-    # if len(prev_boxes) != 0:
-    #     if is_moving(prev_boxes[0],xyxys[0]):
-    #         time.sleep(0.5)
-    #         print("MOVEMENT DETECTED")
-    #         playsound('playerOut.mp3')
+    if len(prev_boxes) != 0:
+        if is_moving(prev_boxes[0],xyxys[0]):
+            t1 = threading.Thread(target=player_out)
+            t1.start()
+
+
 
     prev_boxes = xyxys
 

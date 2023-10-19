@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from playsound import playsound
 
 def is_moving(prev_box_coord,crnt_box_coord):
     """
@@ -68,3 +69,6 @@ def get_com(points):
 
     return (int(xsum//count),int(ysum//count))
 
+def player_out():
+    print("Movement Detected!")
+    playsound('playerOut.mp3')
