@@ -11,6 +11,12 @@ Using OpenCV and a Neato, we will recreate the ‘red light green light’ game 
 
 # TODOs
 
-- [ ] Implement motion detection mvp using YOLOv8
+- [x] Implement motion detection mvp using YOLOv8
+- [x] Implement sort
 - [ ] Read about the math behind YOLOv8
+- [ ] Implement motion detection using unique bounding box id
+
+
+
+
 
