@@ -2,16 +2,16 @@ import numpy as np
 import math
 from playsound import playsound
 
-def is_moving(prev_box_coord,crnt_box_coord):
+def is_moving(prev_box_coord: list,crnt_box_coord: list)->bool:
     """
     Given 2 bounding boxes containing a person, (previous frame & current frame), determine if the person moved
 
     Args:
-        prev_box: A list containing 2 corner coordinates of the bounding box from previous frame [x1,y1,x2,y2]
-        crnt_box: A list containing 2 corner coordinates of the bounding box from current frame [x3,y3,x4,y4]
+        prev_box (list): A list containing 2 corner coordinates of the bounding box from previous frame [x1,y1,x2,y2]
+        crnt_box (list): A list containing 2 corner coordinates of the bounding box from current frame [x3,y3,x4,y4]
 
     Returns:
-        A boolean representing if a person moved between the two frames
+        moving (bool): A boolean representing if a person moved between the two frames
     """
 #------------------------------- Declare Variables ----------------------------------------------------------------------------#
     # Prev_box
@@ -22,7 +22,10 @@ def is_moving(prev_box_coord,crnt_box_coord):
     xy3 = [crnt_box_coord[0],crnt_box_coord[1]]
     xy4 = [crnt_box_coord[2],crnt_box_coord[3]]
 
+    moving = False
+
 #-------------------------------- Implement Function-----------------------------------------------------------------------------#
+
     # What will be considered "moving"?
 
     # 1. bounding box is in a different location; calculate distance traveled from previous location to current
@@ -30,7 +33,7 @@ def is_moving(prev_box_coord,crnt_box_coord):
     dist2 = math.dist(xy2,xy4)
 
     if dist1 >= 5 or dist2 >= 5:
-        return True
+        moving = True
 
     # 2. bounding box is different size
     length1 = abs(xy1[0]-xy2[0])
@@ -40,35 +43,40 @@ def is_moving(prev_box_coord,crnt_box_coord):
     height2 = abs(xy3[1]-xy4[1])
 
     if abs(length2 - length1) >= 5 or abs(height2 - height1) >= 5:
-        return True
+        moving = True
 
+    return moving
+    
 
-    return False
-
-def get_com(points):
+def get_com(points: np.ndarray)->tuple:
     """
     Calculate center of mass given a list of points.
 
     Args:
-        points: list of points represented as a list
+        points (np.ndarray): list of points represented as a list
 
     Returns:
-        center of mass
+        com (tuple): xy coordinates for center of mass represented as a tuple
     """
-    points = list(points)
-    for i,point in enumerate((points)):
+    com = None
+    points_list = points.tolist()
+    for i,point in enumerate((points_list)):
         if point[0] == 0 and point[1] == 0:
-            points.pop(i)
+            points_list.pop(i)
     xsum = 0
     ysum = 0
-    count = len(points)
+    count = len(points_list)
 
-    for point in points:
+    for point in points_list:
         xsum += point[0]
         ysum += point[1]
 
-    return (int(xsum//count),int(ysum//count))
+    com = (int(xsum//count),int(ysum//count))
+    return com
 
-def player_out():
+def player_out()->None:
+    """
+    Play a sound indicating that the player is out from the game
+    """
     print("Movement Detected!")
     playsound('playerOut.mp3')

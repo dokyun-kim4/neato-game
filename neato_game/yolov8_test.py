@@ -64,18 +64,18 @@ while True:
         cv.putText(frame,str(track_id),(x1+10,y1+40), cv.FONT_HERSHEY_PLAIN,3,colors[track_id],2)
 
 
-    # keypoints = attr.keypoints.xy.cpu().numpy()[0]
-    # # Draw keypoints
-    # for i,point in enumerate(keypoints):
-    #     cv.circle(frame, (int(point[0]), int(point[1])), radius, (0,0,red), thickness)
-    #     cv.putText(frame,str(i),(int(point[0]),int(point[1])),cv.FONT_HERSHEY_PLAIN, 2, (255,180,180), 2)
-    #     xsum += int(point[0])
-    #     ysum += int(point[1])
-    #     red += 30
+    keypoints = attr.keypoints.xy.cpu().numpy()[0]
+    # Draw keypoints
+    for i,point in enumerate(keypoints):
+        cv.circle(frame, (int(point[0]), int(point[1])), radius, (0,0,red), thickness)
+        cv.putText(frame,str(i),(int(point[0]),int(point[1])),cv.FONT_HERSHEY_PLAIN, 2, (255,180,180), 2)
+        xsum += int(point[0])
+        ysum += int(point[1])
+        red += 30
     
 
 
-    # cv.circle(frame,get_com(keypoints),radius,(0,0,0), thickness)
+    cv.circle(frame,get_com(keypoints),radius,(0,0,0), thickness)
     cv.imshow('Webcam Feed', frame)
 
 
