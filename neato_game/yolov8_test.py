@@ -1,6 +1,6 @@
 import cv2 as cv
 from ultralytics import YOLO
-from helpers import is_moving, get_com, player_out
+from helpers import is_moving, get_com, player_out, person_bboxes
 import time
 import numpy as np
 from sort import Sort
@@ -11,12 +11,11 @@ model = YOLO('yolov8n-pose.pt')
 red = 10
 radius = 5  # Radius of the circle
 thickness = -1  # Thickness -1 fills the circle
-colors = np.random.uniform(0,255,size=(100,3))
-prev_boxes = []
+colors = np.random.uniform(0,255,size=(999,3))
 
+all_person = None
+prev_boxes = [] # This would be person_bboxes object
 sort = Sort()
-
-
 
 # Start camera
 cap = cv.VideoCapture(0)
@@ -41,43 +40,23 @@ while True:
 
     # Feed frame into YOLO model
     results = model(frame,verbose=False)
+    # Get results
     attr = results[0]
     boxes = attr.boxes.cpu().numpy()
-    xyxys = list(boxes.xyxy)
+    xyxys = boxes.xyxy
     confs = boxes.conf
 
-    for i,xyxy in enumerate(xyxys):
-        xyxy = list(xyxy)
-        xyxy.append(confs[i])
-        xyxys[i] = xyxy
-    
-    if len(xyxys) == 0:
-        tracks = sort.update()
-    else:
-        tracks = sort.update(np.array(xyxys))
-
-
-    # # Draw bounding box (SORT)
-    for track in tracks:
+    # Store all results as a `person_bboxes` object
+    all_person = person_bboxes(xyxys,confs,sort)
+    all_person.update()
+   
+    # Draw bounding box (SORT)
+    for track in all_person.tracks:
         x1,y1,x2,y2,track_id = int(track[0]),int(track[1]),int(track[2]),int(track[3]),int(track[4])
         cv.rectangle(frame,(x1,y1),(x2,y2),colors[track_id],2)
         cv.putText(frame,str(track_id),(x1+10,y1+40), cv.FONT_HERSHEY_PLAIN,3,colors[track_id],2)
 
-
-    keypoints = attr.keypoints.xy.cpu().numpy()[0]
-    # Draw keypoints
-    for i,point in enumerate(keypoints):
-        cv.circle(frame, (int(point[0]), int(point[1])), radius, (0,0,red), thickness)
-        cv.putText(frame,str(i),(int(point[0]),int(point[1])),cv.FONT_HERSHEY_PLAIN, 2, (255,180,180), 2)
-        xsum += int(point[0])
-        ysum += int(point[1])
-        red += 30
-    
-
-
-    cv.circle(frame,get_com(keypoints),radius,(0,0,0), thickness)
     cv.imshow('Webcam Feed', frame)
-
 
     if len(prev_boxes) != 0:
         if is_moving(prev_boxes[0],xyxys[0]):

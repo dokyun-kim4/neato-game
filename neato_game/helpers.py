@@ -1,6 +1,23 @@
 import numpy as np
 import math
 from playsound import playsound
+from sort import Sort
+
+class person_bboxes:
+    def __init__(self,xyxys: np.ndarray, confs: np.ndarray,sort: Sort)->None:
+        self.sort = sort
+        self.xyxys = xyxys
+        self.confs = confs
+        self.conf_boxes = np.array([[xyxy[0],xyxy[1],xyxy[2],xyxy[3],confs[i]] for i,xyxy in enumerate(xyxys)])
+        self.tracks = []
+
+    def update(self):
+        if len(self.xyxys) != 0:
+            self.tracks = self.sort.update(self.conf_boxes)
+        else:
+            self.tracks = self.sort.update()
+            
+
 
 def is_moving(prev_box_coord: list,crnt_box_coord: list)->bool:
     """
