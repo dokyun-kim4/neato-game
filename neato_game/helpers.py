@@ -12,6 +12,9 @@ class person_bboxes:
         self.tracks = np.array([])
 
     def update(self)->None:
+        """
+        Update bbox ids using SORT
+        """
         if len(self.xyxys) != 0:
             self.tracks = self.sort.update(self.conf_boxes)
         else:
@@ -20,7 +23,15 @@ class person_bboxes:
 
 def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes)-> list:
     """
+    Given 2 `person_bboxes` objects, return a list containing ids of people who moved
     Assuming people do not leave or enter the frame once game starts
+
+    Args:
+        prev_bboxes (person_bbox): person_bboxes object representing bboxes from the previous frame
+        crnt_bboxes (person_bbox): person_bboxes object representing bboxes from the current frame
+    
+    Returns:
+        movedPeopleIds (list): list containing ids of people who moved
     """
     movedPeopleIds: list = []
     prev_tracks: np.ndarray = prev_boxes.tracks
@@ -29,7 +40,7 @@ def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes)-> li
     
     for i in range(len(prev_tracks)):
         if isMoving(prev_tracks[i],crnt_tracks[i]):
-            movedPeopleIds.append(prev_tracks[i][4])
+            movedPeopleIds.append(int(prev_tracks[i][4]))
     
     return movedPeopleIds
 
@@ -39,8 +50,8 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray)->bool:
     Given 2 bounding boxes containing a person, (previous frame & current frame), determine if the person moved
 
     Args:
-        prev_box (list): A list containing 2 corner coordinates of the bounding box from previous frame [x1,y1,x2,y2]
-        crnt_box (list): A list containing 2 corner coordinates of the bounding box from current frame [x3,y3,x4,y4]
+        prev_box (np.ndarray): NumPy array containing 2 corner coordinates of the bounding box from previous frame [x1,y1,x2,y2,..]
+        crnt_box (np.ndarray): NumPy array containing 2 corner coordinates of the bounding box from current frame [x3,y3,x4,y4,..]
 
     Returns:
         moving (bool): A boolean representing if a person moved between the two frames
