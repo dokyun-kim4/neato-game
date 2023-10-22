@@ -9,17 +9,32 @@ class person_bboxes:
         self.xyxys = xyxys
         self.confs = confs
         self.conf_boxes = np.array([[xyxy[0],xyxy[1],xyxy[2],xyxy[3],confs[i]] for i,xyxy in enumerate(xyxys)])
-        self.tracks = []
+        self.tracks = np.array([])
 
-    def update(self):
+    def update(self)->None:
         if len(self.xyxys) != 0:
             self.tracks = self.sort.update(self.conf_boxes)
         else:
             self.tracks = self.sort.update()
-            
+                  
+
+def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes)-> list:
+    """
+    Assuming people do not leave or enter the frame once game starts
+    """
+    movedPeopleIds: list = []
+    prev_tracks: np.ndarray = prev_boxes.tracks
+    crnt_tracks: np.ndarray  = crnt_boxes.tracks
+
+    
+    for i in range(len(prev_tracks)):
+        if isMoving(prev_tracks[i],crnt_tracks[i]):
+            movedPeopleIds.append(prev_tracks[i][4])
+    
+    return movedPeopleIds
 
 
-def is_moving(prev_box_coord: list,crnt_box_coord: list)->bool:
+def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray)->bool:
     """
     Given 2 bounding boxes containing a person, (previous frame & current frame), determine if the person moved
 
@@ -31,6 +46,9 @@ def is_moving(prev_box_coord: list,crnt_box_coord: list)->bool:
         moving (bool): A boolean representing if a person moved between the two frames
     """
 #------------------------------- Declare Variables ----------------------------------------------------------------------------#
+    THRESH = 5
+    
+    
     # Prev_box
     xy1 = [prev_box_coord[0],prev_box_coord[1]]
     xy2 = [prev_box_coord[2],prev_box_coord[3]]
@@ -49,7 +67,7 @@ def is_moving(prev_box_coord: list,crnt_box_coord: list)->bool:
     dist1 = math.dist(xy1,xy3)
     dist2 = math.dist(xy2,xy4)
 
-    if dist1 >= 5 or dist2 >= 5:
+    if dist1 >= THRESH or dist2 >= THRESH:
         moving = True
 
     # 2. bounding box is different size
@@ -59,13 +77,13 @@ def is_moving(prev_box_coord: list,crnt_box_coord: list)->bool:
     length2 = abs(xy3[0]-xy4[0])
     height2 = abs(xy3[1]-xy4[1])
 
-    if abs(length2 - length1) >= 5 or abs(height2 - height1) >= 5:
+    if abs(length2 - length1) >= THRESH or abs(height2 - height1) >= THRESH:
         moving = True
 
     return moving
     
 
-def get_com(points: np.ndarray)->tuple:
+def getCOM(points: np.ndarray)->tuple:
     """
     Calculate center of mass given a list of points.
 
@@ -91,9 +109,8 @@ def get_com(points: np.ndarray)->tuple:
     com = (int(xsum//count),int(ysum//count))
     return com
 
-def player_out()->None:
+def playerOut()->None:
     """
     Play a sound indicating that the player is out from the game
     """
-    print("Movement Detected!")
     playsound('playerOut.mp3')
