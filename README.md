@@ -7,7 +7,7 @@
 <br>
 
 # Introduction
-Using OpenCV and a Neato, we will recreate the ‘red light green light’ game from the Netflix show *Squid Game*. The Neato will periodically rotate towards the players, and whoever is still moving gets eliminated from the game.
+Using OpenCV and a Neato, we will recreate the *red light green light* game from the Netflix show *Squid Game*. The Neato will periodically rotate towards the players, and whoever is still moving gets eliminated from the game.
 
 # Methodology
 This program uses 2 popular computer vision algorithms in its main functionality. YOLO (You Only Look Once) is used for person detection, and SORT (Simple Online Realtime Tracking) is used for tracking unique people throughout the game. A more detailed explanation of each algorithm will be provided in the following sections.
