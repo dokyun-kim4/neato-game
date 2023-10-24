@@ -1,6 +1,5 @@
 import numpy as np
 import cv2 as cv
-import cv2.typing as cvtype
 from image_difference import Diff
 
 # start video capture
@@ -10,7 +9,7 @@ if not cap.isOpened():
     exit()    
 
 img_queue_len = 1 # The number of images to keep, not including the current one
-img_queue:list[cvtype.MatLike] = [] # The image queue, from oldest image to newest
+img_queue:list[np.ndarray] = [] # The image queue, from oldest image to newest
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()

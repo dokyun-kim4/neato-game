@@ -4,7 +4,6 @@ from playsound import playsound
 from sort import Sort
 from image_difference import Diff
 import cv2 as cv
-import cv2.typing as cvtype
 
 class person_bboxes:
     def __init__(self,xyxys: np.ndarray, confs: np.ndarray,sort: Sort)->None:
@@ -24,7 +23,7 @@ class person_bboxes:
             self.tracks = self.sort.update()
                   
 
-def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes, prev_img: cvtype.MatLike, crnt_img: cvtype.MatLike)-> list:
+def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes, prev_img: np.ndarray, crnt_img: np.ndarray)-> list:
     """
     Given 2 `person_bboxes` objects, return a list containing ids of people who moved
     Assuming people do not leave or enter the frame once game starts
@@ -50,7 +49,7 @@ def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes, prev
     return movedPeopleIds
 
 
-def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: cvtype.MatLike, crnt_img: cvtype.MatLike)->bool:
+def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: np.ndarray, crnt_img: np.ndarray)->bool:
     """
     Given 2 bounding boxes containing a person, (previous frame & current frame), determine if the person moved
 
@@ -103,7 +102,6 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: c
     crnt_x2_pixel = round(xy4[0])
     crnt_y2_pixel = round(xy4[1])
     moved_in_bbox = int(np.sum(diff[crnt_y1_pixel:crnt_y2_pixel, crnt_x1_pixel:crnt_x2_pixel]) / 255)
-    print(moved_in_bbox)
 
     if moved_in_bbox >= IMAGE_DIFFERENCE_THRESH:
         moving = True

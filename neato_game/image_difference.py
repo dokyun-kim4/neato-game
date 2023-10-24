@@ -1,6 +1,6 @@
 import numpy as np
 import cv2 as cv
-import cv2.typing as cvtype
+
 
 # set the default kernel to a cross with the proper dtype
 default_kernel = np.array([
@@ -9,7 +9,7 @@ default_kernel = np.array([
     [0, 1, 0]
 ], dtype=np.uint8)
 
-def Diff(img1: cvtype.MatLike, img2: cvtype.MatLike, threshold:int=10, kernel=default_kernel):
+def Diff(img1: np.ndarray, img2: np.ndarray, threshold:int=10, kernel=default_kernel):
     """
     Finds the pixels that have changed between two images
 
