@@ -2,6 +2,9 @@ import numpy as np
 import math
 from playsound import playsound
 from sort import Sort
+from image_difference import Diff
+import cv2 as cv
+import cv2.typing as cvtype
 
 class person_bboxes:
     def __init__(self,xyxys: np.ndarray, confs: np.ndarray,sort: Sort)->None:
@@ -21,7 +24,7 @@ class person_bboxes:
             self.tracks = self.sort.update()
                   
 
-def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes)-> list:
+def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes, prev_img: cvtype.MatLike, crnt_img: cvtype.MatLike)-> list:
     """
     Given 2 `person_bboxes` objects, return a list containing ids of people who moved
     Assuming people do not leave or enter the frame once game starts
@@ -29,6 +32,8 @@ def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes)-> li
     Args:
         prev_bboxes (person_bbox): person_bboxes object representing bboxes from the previous frame
         crnt_bboxes (person_bbox): person_bboxes object representing bboxes from the current frame
+        prev_img (MatLike): the previous image for detecting movement
+        crnt_img (MatLike): the current image for detecting movement
     
     Returns:
         movedPeopleIds (list): list containing ids of people who moved
@@ -39,13 +44,13 @@ def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes)-> li
 
     
     for i in range(len(prev_tracks)):
-        if isMoving(prev_tracks[i],crnt_tracks[i]):
+        if isMoving(prev_tracks[i],crnt_tracks[i], prev_img, crnt_img):
             movedPeopleIds.append(int(prev_tracks[i][4]))
     
     return movedPeopleIds
 
 
-def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray)->bool:
+def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: cvtype.MatLike, crnt_img: cvtype.MatLike)->bool:
     """
     Given 2 bounding boxes containing a person, (previous frame & current frame), determine if the person moved
 
@@ -57,8 +62,8 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray)->bool:
         moving (bool): A boolean representing if a person moved between the two frames
     """
 #------------------------------- Declare Variables ----------------------------------------------------------------------------#
-    THRESH = 5
-    
+    BBOX_MOVEMENT_THRESH = 5
+    IMAGE_DIFFERENCE_THRESH = 10000
     
     # Prev_box
     xy1 = [prev_box_coord[0],prev_box_coord[1]]
@@ -78,7 +83,7 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray)->bool:
     dist1 = math.dist(xy1,xy3)
     dist2 = math.dist(xy2,xy4)
 
-    if dist1 >= THRESH or dist2 >= THRESH:
+    if dist1 >= BBOX_MOVEMENT_THRESH or dist2 >= BBOX_MOVEMENT_THRESH:
         moving = True
 
     # 2. bounding box is different size
@@ -88,7 +93,19 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray)->bool:
     length2 = abs(xy3[0]-xy4[0])
     height2 = abs(xy3[1]-xy4[1])
 
-    if abs(length2 - length1) >= THRESH or abs(height2 - height1) >= THRESH:
+    if abs(length2 - length1) >= BBOX_MOVEMENT_THRESH or abs(height2 - height1) >= BBOX_MOVEMENT_THRESH:
+        moving = True
+
+    # 3. the pixels in the bounding box changed enough
+    diff = Diff(prev_img, crnt_img)
+    crnt_x1_pixel = round(xy3[0])
+    crnt_y1_pixel = round(xy3[1])
+    crnt_x2_pixel = round(xy4[0])
+    crnt_y2_pixel = round(xy4[1])
+    moved_in_bbox = int(np.sum(diff[crnt_y1_pixel:crnt_y2_pixel, crnt_x1_pixel:crnt_x2_pixel]) / 255)
+    print(moved_in_bbox)
+
+    if moved_in_bbox >= IMAGE_DIFFERENCE_THRESH:
         moving = True
 
     return moving

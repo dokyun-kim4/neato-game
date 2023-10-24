@@ -16,6 +16,7 @@ colors = np.random.uniform(0,255,size=(999,3))
 outHistory = []
 
 prev_people = None # This would be person_bboxes object
+prev_frame = None # This would be the previous image
 sort = Sort()
 
 # Start camera
@@ -26,12 +27,16 @@ if not cap.isOpened():
     print("Error: Unable to access the camera.")
     exit()
 
+for _ in range(10):
+    # Take a few frames so the camera can adjust
+    cap.read()
+
 time.sleep(0.5)
 while True:
     xsum = 0
     ysum = 0
     # Read a frame from the camera
-    ret, frame = cap.read()
+    ret, crnt_frame = cap.read()
 
     # Check if the frame was read successfully
     if not ret:
@@ -40,7 +45,7 @@ while True:
 
 
     # Feed frame into YOLO model
-    results = model(frame,verbose=False)
+    results = model(crnt_frame,verbose=False)
     # Get results
     attr = results[0]
     boxes = attr.boxes.cpu().numpy()
@@ -50,20 +55,13 @@ while True:
     # Store all results as a `person_bboxes` object
     crnt_people = person_bboxes(xyxys,confs,sort)
     crnt_people.update()
-   
-    # Draw bounding box (SORT)
-    for track in crnt_people.tracks:
-        x1,y1,x2,y2,track_id = int(track[0]),int(track[1]),int(track[2]),int(track[3]),int(track[4])
-        cv.rectangle(frame,(x1,y1),(x2,y2),colors[track_id],2)
-        cv.putText(frame,str(track_id),(x1+10,y1+40), cv.FONT_HERSHEY_PLAIN,3,colors[track_id],2)
 
-    cv.imshow('Webcam Feed', frame)
-
-    if prev_people is None:
+    if prev_people is None or prev_frame is None:
         prev_people = crnt_people
+        prev_frame = crnt_frame
         continue
 
-    ids = getMovedPeopleIDs(prev_people,crnt_people)
+    ids = getMovedPeopleIDs(prev_people,crnt_people,prev_frame,crnt_frame)
     for id in ids:
         if id in outHistory:
             continue
@@ -76,6 +74,15 @@ while True:
             t1.start()
 
     prev_people = crnt_people
+    prev_frame = crnt_frame.copy()
+
+    # Draw bounding box (SORT)
+    for track in crnt_people.tracks:
+        x1,y1,x2,y2,track_id = int(track[0]),int(track[1]),int(track[2]),int(track[3]),int(track[4])
+        cv.rectangle(crnt_frame,(x1,y1),(x2,y2),colors[track_id],2)
+        cv.putText(crnt_frame,str(track_id),(x1+10,y1+40), cv.FONT_HERSHEY_PLAIN,3,colors[track_id],2)
+
+    cv.imshow('Webcam Feed', crnt_frame)
 
     # Exit the loop if 'q' is pressed
     if cv.waitKey(1) & 0xFF == ord('q'):

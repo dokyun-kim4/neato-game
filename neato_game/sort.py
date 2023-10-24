@@ -305,7 +305,7 @@ if __name__ == '__main__':
         if(display):
           fn = os.path.join('mot_benchmark', phase, seq, 'img1', '%06d.jpg'%(frame))
           im =io.imread(fn)
-          ax1.imshow(im)
+          ax1.imshow(im) # type: ignore
           plt.title(seq + ' Tracked Targets')
 
         start_time = time.time()
@@ -317,12 +317,12 @@ if __name__ == '__main__':
           print('%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1'%(frame,d[4],d[0],d[1],d[2]-d[0],d[3]-d[1]),file=out_file)
           if(display):
             d = d.astype(np.int32)
-            ax1.add_patch(patches.Rectangle((d[0],d[1]),d[2]-d[0],d[3]-d[1],fill=False,lw=3,ec=colours[d[4]%32,:]))
+            ax1.add_patch(patches.Rectangle((d[0],d[1]),d[2]-d[0],d[3]-d[1],fill=False,lw=3,ec=colours[d[4]%32,:])) # type: ignore
 
         if(display):
-          fig.canvas.flush_events()
+          fig.canvas.flush_events() # type: ignore
           plt.draw()
-          ax1.cla()
+          ax1.cla() # type: ignore
 
   print("Total Tracking took: %.3f seconds for %d frames or %.1f FPS" % (total_time, total_frames, total_frames / total_time))
 
