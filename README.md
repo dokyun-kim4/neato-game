@@ -41,6 +41,8 @@ Compared to neural networks of RCNN-type algorithms, YOLO's neural network is mu
 
 # Works Cited
 
-Bewley, Alex, et al. "Simple online and realtime tracking." 2016 IEEE International Conference on Image Processing (ICIP), 2016, pp. 3464-3468. doi:10.1109/ICIP.2016.7533003.
+Bewley, Alex, et al. "Simple online and realtime tracking." 2016 IEEE International Conference on Image Processing (ICIP), 2016, pp. 3464-3468. doi:10.1109/ICIP.2016.7533003.  
 
-Oh, Il-Seok. Pattern Recognition, Computer Vision, and Machine Learning. Hanbit Academy, 2023. 
+Oh, Il-Seok. Pattern Recognition, Computer Vision, and Machine Learning. Hanbit Academy, 2023.  
+
+Redmon, Joseph, et al. "You only look once: Unified, real-time object detection." Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.
