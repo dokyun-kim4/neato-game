@@ -14,9 +14,9 @@ This program uses 2 popular computer vision algorithms in its main functionality
 
 ## YOLO (You Only Look Once)
 
-Unlike other detection methods such as HOG (Histogram of Gradients), RCNN, or CNN, YOLO significantly outperforms them in speed. YOLO v1, which was released in 2016, processed 45 frames per second on a Titan X GPU. YOLO locates and classifies an object at the same time in a one-step process, hence the name 'You Only Look Once.'
+Unlike other detection methods such as HOG (Histogram of Gradients), RCNN, or CNN, YOLO significantly outperforms them in speed. YOLO v1, released in 2016, processed 45 frames per second on a Titan X GPU. YOLO locates and classifies an object at the same time in a one-step process, hence the name 'You Only Look Once.'
 
-YOLO divides a given image into a S x S grid. This is represented with the yellow lines in the image below. The red boxes are objects identified by the algorithm. 
+YOLO divides a given image into a S x S grid, represented with the yellow lines in the image below. The red boxes are objects identified by the algorithm. 
 
 <p>
   <img src="img/yolo.png" />
