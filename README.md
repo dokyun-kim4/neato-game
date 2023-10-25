@@ -60,7 +60,7 @@ Then, the IOU (Intersection Over Union) of $B_{detection}$ and $B_{prediction}$ 
   <img src="img/distance-mat.png" style="width: 50%;" />
 </p>
 
-*Fig 3: Example distance matrix calculated using $B_{detection} = [1,2,3,4]$ and $B_{predicted} = [a,b,c]$. A placeholder box $d$ has been added to $B_{predicted}$ to form a square matrix.*
+*Fig 3: Example distance matrix calculated using* $B_{detection} = [1,2,3,4]$ *and* $B_{predicted} = [a,b,c]$. *A placeholder box* $d$ *has been added to* $B_{predicted}$ *to form a square matrix.*
 
 
 # Works Cited
