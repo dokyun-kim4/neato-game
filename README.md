@@ -9,9 +9,18 @@
 Using OpenCV and a Neato, we will recreate the **Red Light Green Light** game from the Netflix show *Squid Game*. The Neato will periodically rotate towards the players, and whoever is still moving gets eliminated from the game.
 
 # Methodology
-This program uses 2 popular computer vision algorithms in its main functionality. YOLO (You Only Look Once) is used for person detection, and SORT (Simple Online Realtime Tracking) is used for tracking unique people throughout the game. A more detailed explanation of each algorithm will be provided in the following sections.
+This program uses 2 popular computer vision algorithms (YOLO and SORT) to track people's movement.
 
-## YOLO (You Only Look Once)
+Tracking algorithms usually consist of 4 main steps. 
+1. Identification
+2. Extract features
+3. Calculate distance
+4. Match pairs
+
+**Step 1** is done using YOLO (You Only Look Once) while **steps 2, 3 and 4** will be done using SORT (Simple Online Realtime Tracking). 
+An explanation of each algorithm will be provided in the sections below.
+
+## Using YOLO (You Only Look Once)
 
 Unlike other detection methods such as HOG (Histogram of Gradients), RCNN, or CNN, YOLO significantly outperforms them in speed. YOLO v1, released in 2016, processed 45 frames per second on a Titan X GPU. YOLO locates and classifies an object at the same time in a one-step process, hence the name 'You Only Look Once.'
 
@@ -23,7 +32,7 @@ YOLO divides a given image into a S x S grid, represented with the yellow lines 
   <img src="img/yolo.png" />
 </p>
 
-*Img 1: YOLO example*
+*Fig 1: YOLO example*
 
 
 Each grid cell is represented as a multidimensional vector. The first 5 values are $[x_1,y_1,w_1,h_1,c_1]$, where $(x_1,y_1), w_1, h_1$ are the position, width, and height of the bounding box, and $c_1$ is the confidence level (0~1). The next 5 values are $[x_2,y_2,w_2,h_2,c_2]$, as each grid cell can handle up to 2 bounding boxes. The remaining values are $[p_1...p_80]$ where each value represents what object the box belongs to in the train dataset. This example uses the COCO dataset, which has 80 objects. For example, if the 3rd object in the dataset was a person, the values would look like $[0,0,1,....0]$. The final output of the neural network ends up being a S x S x 90 tensor.
@@ -34,10 +43,24 @@ Compared to neural networks of RCNN-type algorithms, YOLO's neural network is mu
   <img src="img/neuralnet.png" />
 </p>
 
-*Img 2: YOLO's neural network structure*
+*Fig 2: YOLO's neural network structure*
 
 
-## Simple Online Real-time Tracking (SORT)
+## Using SORT (Simple Online Realtime Tracking)
+
+<!-- SORT INTRODUCTION -->
+
+Let $B_{detection}$ represent all the bounding boxes containing people that are identified by YOLO. During the feature extraction process, SORT uses the target's size and past movement from time $t-1$ (equation 1). $(x,y)$ is the target's center, $s$ is size, $r$ is the height to width ratio (fixed). $\dot{x}, \dot{y}, \dot{s}$ represent the previous movement performed by the target. SORT then uses this information to predict the target's location at time $t$. The predictions are stored in $B_{prediction}$.
+
+$b=(x,y,s,r, \dot{x}, \dot{y}, \dot{s})$ *Equation 1*
+
+Then, the IOU (Intersection Over Union) of $B_{detection}$ and $B_{prediction}$ is calculated and converted to distance by subtracting it from 1. These distances are then stored in a matrix. If the number of boxes in $B_{detection}$ and $B_{prediction}$ are different, placeholder boxes are added to the smaller set to ensure both matrices are square. The placeholder boxes have a large distance value to prevent matching with real boxes. A distance matrix example is shown below.
+
+<p>
+  <img src="img/distance-mat.png" style="width: 50%;" />
+</p>
+
+*Fig 3: Example distance matrix calculated using $B_{detection} = [1,2,3,4]$ and $B_{predicted} = [a,b,c]$. A placeholder box $d$ has been added to $B_{predicted}$ to form a square matrix.*
 
 
 # Works Cited
