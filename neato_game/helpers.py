@@ -62,7 +62,7 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
     """
 #------------------------------- Declare Variables ----------------------------------------------------------------------------#
     BBOX_MOVEMENT_THRESH = 5
-    IMAGE_DIFFERENCE_THRESH = 10000
+    IMAGE_DIFFERENCE_THRESH = 1000
     
     # Prev_box
     xy1 = [prev_box_coord[0],prev_box_coord[1]]
@@ -96,7 +96,7 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
         moving = True
 
     # 3. the pixels in the bounding box changed enough
-    diff = Diff(prev_img, crnt_img)
+    diff = Diff(prev_img, crnt_img, threshold=25)
     crnt_x1_pixel = round(xy3[0])
     crnt_y1_pixel = round(xy3[1])
     crnt_x2_pixel = round(xy4[0])
