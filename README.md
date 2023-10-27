@@ -62,6 +62,31 @@ Then, the IOU (Intersection Over Union) of $B_{detection}$ and $B_{prediction}$ 
 
 *Fig 3: Example distance matrix calculated using* $B_{detection} = [1,2,3,4]$ *and* $B_{predicted} = [a,b,c]$. *A placeholder box* $d$ *has been added to* $B_{predicted}$ *to form a square matrix.*
 
+With the distance matrix, SORT now applies the [Hungarian Algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm) to find the best-matching pairs. The Hungarian Algorithm is an optimization algorithm that assigns 'tasks' to 'workers' to minimize the 'cost.' For example, when assigning tasks (a~c) to workers (1~3) given the cost matrix below (Fig 4), the pairs 1-c, 2-a, 3-b would minimize the cost.
+
+<p>
+  <img src="img/hungarian-example.png" style="width: 50%;" />
+</p>
+
+*Fig 4: Example of the Hungarian Algorithm, the highlighted cells represent the pairings that minimize the cost.*
+
+With this in mind, finding best-matching pairs using the distance matrix (Fig 3) becomes an optimization problem for assigning boxes from $B_{predicted}$ (task) to $B_{detected}$ (workers) to minimize the distances (cost).
+
+<p>
+  <img src="img/hungarian-img-example.png" style="width: 50%;" />
+</p>
+
+*Fig 5: Result of applying the Hungarian Algorithm to the distance matrix. The best-matching pairs are 1-b, 2-d, 3-a, and 4-c. Since column d was added for the sake of making the matrix square, the 2-d pairing gets thrown out.*
+
+Once SORT finishes all the steps described above, it moves onto the next frame after postprocessing. During postprocessing, the $b$ values (equation 1) of each target in $B_{predicted}$ gets updated depending on if they have been matched. For targets with a match, their $x,y,s,r$ is replaced with those of their matching pairs, and their $\dot{x}, \dot{y}, \dot{s}$ is updated using a [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter). For targets without a match, their $x,y,s$ is updated by adding $\dot{x}, \dot{y}, \dot{s}$. For boxes in $B_{detected}$ without a match, 
+
+
+
+<!-- IMAGE FROM ACTUAL PROGRAM WITH BBOX IDS HERE -->
+
+## Image Substraction
+
+LOREM IPSUM
 
 # Works Cited
 
