@@ -62,7 +62,7 @@ Then, the IOU (Intersection Over Union) of $B_{detection}$ and $B_{prediction}$ 
 
 *Fig 3: Example distance matrix calculated using* $B_{detection} = [1,2,3,4]$ *and* $B_{predicted} = [a,b,c]$. *A placeholder box* $d$ *has been added to* $B_{predicted}$ *to form a square matrix.*
 
-With the distance matrix, SORT now applies the [Hungarian Algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm) to find the best-matching pairs. The Hungarian Algorithm is an optimization algorithm that assigns 'tasks' to 'workers' to minimize the 'cost.' For example, when assigning tasks (a~c) to workers (1~3) given the cost matrix below (Fig 4), the pairs 1-c, 2-a, 3-b would minimize the cost.
+With the distance matrix, SORT now applies the [Hungarian Algorithm](https://en.wikipedia.org/wiki/Hungarian_algorithm) to find the best-matching pairs. The Hungarian Algorithm is an optimization algorithm that assigns 'tasks' to 'workers' to minimize the 'cost.' For example, when assigning tasks (a-c) to workers (1-3) given the cost matrix below (Fig 4), the pairs 1-c, 2-a, 3-b would minimize the cost.
 
 <p>
   <img src="img/hungarian-example.png" style="width: 50%;" />
