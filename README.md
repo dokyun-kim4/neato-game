@@ -78,9 +78,7 @@ With this in mind, finding best-matching pairs using the distance matrix (Fig 3)
 
 *Fig 5: Result of applying the Hungarian Algorithm to the distance matrix. The best-matching pairs are 1-b, 2-d, 3-a, and 4-c. Since column d was added for the sake of making the matrix square, the 2-d pairing gets thrown out.*
 
-Once SORT finishes all the steps described above, it moves onto the next frame after postprocessing. During postprocessing, the $b$ values (equation 1) of each target in $B_{predicted}$ gets updated depending on if they have been matched. For targets with a match, their $x,y,s,r$ is replaced with those of their matching pairs, and their $\dot{x}, \dot{y}, \dot{s}$ is updated using a [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter). For targets without a match, their $x,y,s$ is updated by adding $\dot{x}, \dot{y}, \dot{s}$. For boxes in $B_{detected}$ without a match, 
-
-
+Once SORT finishes all the steps described above, it moves onto the next frame after postprocessing. During postprocessing, the $b$ values (equation 1) of each target in $B_{predicted}$ gets updated depending on if they have been matched. For targets with a match, their $x,y,s,r$ is replaced with those of their matching pairs, and their $\dot{x}, \dot{y}, \dot{s}$ is updated using a [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter). For targets without a match, their $x,y,s$ is updated by adding $\dot{x}, \dot{y}, \dot{s}$. For boxes in $B_{detected}$ without a match, they are considered new objects and their *b* values are initialized with $\dot{x}=0, \dot{y}=0, \dot{s}=0$. The new boxes are added to $B_{predicted}$.
 
 <!-- IMAGE FROM ACTUAL PROGRAM WITH BBOX IDS HERE -->
 
