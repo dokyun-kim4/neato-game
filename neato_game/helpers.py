@@ -1,8 +1,8 @@
 import numpy as np
 import math
 from playsound import playsound
-from sort import Sort
-from image_difference import Diff
+from .sort import Sort
+from .image_difference import Diff
 import cv2 as cv
 
 class person_bboxes:
