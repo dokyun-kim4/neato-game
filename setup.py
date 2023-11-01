@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'run_neato_game = neato_game.run_neato_game:main'
         ],
     },
 )

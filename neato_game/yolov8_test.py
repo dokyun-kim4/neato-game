@@ -8,9 +8,6 @@ import threading
 
 # Load YOLO model
 model = YOLO('yolov8n-pose.pt')
-red = 10
-radius = 5  # Radius of the circle
-thickness = -1  # Thickness -1 fills the circle
 colors = np.random.uniform(0,255,size=(999,3))
 
 outHistory = []
