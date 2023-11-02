@@ -84,7 +84,51 @@ Once SORT finishes all the steps described above, it moves onto the next frame a
 
 ## Image Substraction
 
-LOREM IPSUM
+Identifying people and tracking their bounding boxes works well to detect some movement, but if a player moves within their bounding box, the size and shape of the bounding box may not change. To pick up these in-bounding box movements, we used an image difference algorithm to calculate how much the pixels in each bounding box changed between two sequential frames of the video.
+
+To start, the absolute difference between two images is found:
+
+<p align="center">
+  <img src="img/frame1.png" style="width: 30%;" />
+  +
+  <img src="img/frame2.png" style="width: 30%;" />
+  ->
+  <img src="img/difference.png" style="width: 30%;" />
+</p>
+
+*Fig 6: The `cv.absdiff()` between two consecutive frames of video*
+
+Then, the image is converted to grayscale if it isn't already. The reason this is done after the difference opperation is that it captures more of the difference. 
+
+<p align="center">
+  <img src="img/difference.png" style="width: 30%;" />
+  ->
+  <img src="img/gray.png" style="width: 30%;" />
+</p>
+
+*Fig 7: The `cv.cvtColor(_, cv.COLOR_BGR2GRAY)` of the difference of the frames*
+
+Once the image is grayscale, it is threshholded, making it a binary image composed of white pixels that changed and black pixels that did not. 
+
+<p align="center">
+  <img src="img/gray.png" style="width: 30%;" />
+  ->
+  <img src="img/filtered.png" style="width: 30%;" />
+</p>
+
+*Fig 8: The `cv.threshold(_, threshold, 255, cv.THRESH_BINARY)` of the grayscale difference using the given threshhold*
+
+Finally, the image is opened to remove noise, which is an errosion followed by a dilation. This operation will remove small differences that are likely noise without significantly affecting the area of larger differences.    
+
+<p align="center">
+  <img src="img/filtered.png" style="width: 30%;" />
+  ->
+  <img src="img/opened.png" style="width: 30%;" />
+</p>
+
+*Fig 9: The `cv.morphologyEx(_, cv.MORPH_OPEN, kernel)` of the threshholded difference using the given kernel*
+
+Once we have the final difference, we find the amount of changed pixels in each player's bounding box. If this sum is greater than a certain number, then the player is considered to have moved.
 
 # Works Cited
 
