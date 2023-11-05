@@ -130,6 +130,68 @@ Finally, the image is opened to remove noise, which is an errosion followed by a
 
 Once we have the final difference, we find the amount of changed pixels in each player's bounding box. If this sum is greater than a certain number, then the player is considered to have moved.
 
+# Adding Game Features (neato_integration branch)
+
+In a real game of Red Light Green Light, there is one "traffic cop" who turns towards the players in random time intervals. When a player is caught moving while the traffic cop is facing the players, they are eliminated from the game. If a player manages to tap the traffic cop's shoulders without getting eliminated, game is finished.
+
+
+## State Machine
+A [Neato](https://neatorobotics.com/collections/robot-vacuums) will be the traffic cop for this project, rotating towards/away from players periodically and searching for movement. Shown below is a state diagram for various states the Neato will be in throughout the game.
+
+```mermaid
+graph TD;
+  F([init])
+  A([random_wait])
+  B([turn_to])
+  C([scan_and_elim])
+  D([turn_away])
+  E([game_end])
+
+  F -->|initialize| A
+  A -->|finish timer| B
+  B -->|finish turn| C
+  C -->|5 seconds| D
+  D -->|finish turn| A
+
+  A-->|bumper triggered| E
+  B-->|bumper triggered| E
+  C-->|bumper triggered| E
+  D-->|bumper triggered| E
+```
+*Fig 10: State Diagram of Neato*
+
+- `random_wait` state is when the Neato is waiting for a randomly selected time period before turning towards the players.   
+- `turn_to` state is when the Neato is turning towards the players.  
+- `scan_and_elim` is when the Neato is scanning for movement and elimininating moving players.  
+- `turn_away` is when the Neato's scanning period (5 seconds) has passed and is turning away from the players.
+- `game_end` can be entered at any point in the loop when the Neato's bump switch is triggered. This represents the shoulder tapping, indicating that the game is over.
+
+## Nodes
+To integrate key game features into the Neato, various topics need to be published and subscribed to. In our case, there are 2 subscriber nodes and 1 publisher node.
+
+```mermaid
+graph TD;
+  A([Node 'run_neato_game'])
+  B([subscriber nodes])
+  C([publisher nodes])
+  D([odometry])
+  E([image])
+  F([cmd_vel])
+
+A -->|creates| B
+A -->|creates| C
+
+B -->|subscribes| D
+B -->|subscribes| E
+
+C -->|publishes| F
+```
+*Fig 11: Node Diagram*
+
+The `odometry` subscriber ensures the Neato is turning the correct amount every iteration. The `image` subcriber collects frames that are used for movement detection. The `cmd_vel` publisher ensures that the Neato turns at a desired angular velocity.
+
+<!-- DEMO HERE? -->
+
 # Works Cited
 
 Bewley, Alex, et al. "Simple online and realtime tracking." 2016 IEEE international conference on image processing (ICIP). IEEE, 2016. 
