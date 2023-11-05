@@ -4,6 +4,7 @@ from playsound import playsound
 from .sort import Sort
 from .image_difference import Diff
 import cv2 as cv
+from geometry_msgs.msg import Quaternion
 
 class person_bboxes:
     def __init__(self,xyxys: np.ndarray, confs: np.ndarray,sort: Sort)->None:
@@ -140,3 +141,39 @@ def playerOut()->None:
     Play a sound indicating that the player is out from the game
     """
     playsound('playerOut.mp3')
+
+def get_angle(q: Quaternion):
+    """
+    Get the yaw angle of a quaternion
+
+    Args:
+        q (geometry_msgs.msg.Quaternion): the quaternion to get the angle from
+
+    Returns:
+        angle (float): the yaw angle of the quaternion in degrees
+    """
+    siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+    cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+    angle = np.arctan2(siny_cosp, cosy_cosp)
+
+    return np.rad2deg(angle)
+
+def get_delta_angle(a1, a2):
+    """
+    Get the angle from a1 to a2, (-180, 180]
+    
+    Args:
+        a1 (float): the current angle in degrees
+        a2 (float): the target angle in degrees
+    Returns:
+        delta_angle (float): the angle between a1 and a2 in degrees
+    """
+
+    delta_angle = a2 - a1
+
+    if delta_angle > 180:
+        delta_angle -= 360
+    elif delta_angle <=-180:
+        delta_angle += 360
+
+    return delta_angle

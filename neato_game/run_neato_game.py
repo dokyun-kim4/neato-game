@@ -5,11 +5,13 @@ import time
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry as Odom
 import cv2 as cv
 from ultralytics import YOLO
 from .helpers import *
 import time
 import numpy as np
+import math
 from .sort import Sort
 
 class neatoGame(Node):
@@ -25,15 +27,31 @@ class neatoGame(Node):
         self.prev_frame = None # This would be the previous image
         self.sort = Sort()
         self.detect_movement = False
-
+        self.initial_angle: float | None = None
+        self.angle: float = 0.0
 
         self.crnt_frame =  None                        # the latest image from the camera
         self.bridge = CvBridge()                    # used to convert ROS messages to OpenCV
 
         self.create_subscription(Image, image_topic, self.process_image, 10)
+        self.odom_sub = self.create_subscription(Odom,'odom',callback=self.update_angle,qos_profile=10)
         self.pub = self.create_publisher(Twist, 'cmd_vel', 10)
         thread = Thread(target=self.loop_wrapper)
         thread.start()
+
+    def update_angle(self, msg: Odom):
+        """Update the angle of the Neato every time an Odom message is recieved"""
+        # get the angle
+        angle: float = get_angle(msg.pose.pose.orientation)
+        # set the anlge the Neato started at if it hasnt been set already (self.angle would be 0, which is why it isn't set)
+        if self.initial_angle == None:
+            self.initial_angle = angle
+        # otherwise, set the current angle, and make sure it is between 0 and 360
+        else:
+            angle = self.initial_angle - angle
+            if angle < 0:
+                angle += 360
+            self.angle = angle
 
     def process_image(self, msg):
         """ Process image messages from ROS and stash them in an attribute
@@ -81,6 +99,54 @@ class neatoGame(Node):
             self.prev_people = crnt_people
             self.prev_frame = self.crnt_frame.copy() # type: ignore
 
+    def turnTo(self, deg, max_speed=120.0, thresh=5.0) -> None:
+        """
+        Command the Neato to turn to a specific angle, with an optional maximum speed, without blocking the code
+        
+        Args: 
+            deg (float): the angle to turn to in degrees
+            max_speed (float): the maximum angular speed of the Neato in degrees per second, defaults to 120
+            thresh (float): the theshold for the target angle in degrees, defaults to 5
+        """
+        # Start a thread so this doesn't block the run loop
+        Thread(target=self.turnToThreadTarget, args=(deg, max_speed, thresh)).start()
+
+    def turnToThreadTarget(self, deg, max_speed, thresh) -> None:
+        """
+        Command the Neato to turn to a specific angle, with an optional maximum speed. Blocks code.
+        
+        Args: 
+            deg (float): the angle to turn to in degrees
+            max_speed (float): the maximum angular speed of the Neato in degrees per second
+            thresh (float): the theshold for the target angle in degrees
+        """
+        # create the message to publish to the Neato to make it move
+        msg = Twist()
+
+        # find how much the Neato needs to turn to get to the target angle
+        delta_angle = get_delta_angle(self.angle, deg)
+        # repeat until the Neato is pretty close to the target angle
+        while abs(delta_angle) > thresh:
+            
+            # get the direction and speed
+            direction = np.sign(delta_angle)
+            speed = min(abs(delta_angle), max_speed)
+
+            # tell the Neato to move
+            msg.angular.z = np.deg2rad(speed) * -direction
+            self.pub.publish(msg)
+
+            # wait a bit so the Neato actually has time to do something
+            time.sleep(0.05)
+
+            # recalculate how much the Neato needs to turn to get to the target angle
+            delta_angle = get_delta_angle(self.angle, deg)
+
+        # tell the Neato to stop
+        msg.angular.z = 0.0
+        self.pub.publish(msg)
+        
+
     def loop_wrapper(self):
         """ This function takes care of calling the run_loop function repeatedly.
             We are using a separate thread to run the loop_wrapper to work around
@@ -103,6 +169,15 @@ class neatoGame(Node):
             waitKey = cv.waitKey(1) & 0xFF
             if waitKey == ord('w'):
                 self.detect_movement = not self.detect_movement
+            if waitKey == ord('t'):
+                # tell the Neato to stop so it's easy to stop if something goes wrong. Probably not nescessary any more, but nice to have
+                msg = Twist()
+                msg.angular.z = 0.0
+                self.pub.publish(msg)
+
+                # get an angle from the user and tell the Neato to go to it
+                command_angle = float(input("What angle should the neato go to? "))
+                self.turnTo(command_angle)
 
 if __name__ == '__main__':
     node = neatoGame("/camera/image_raw")
