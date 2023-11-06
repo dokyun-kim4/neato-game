@@ -1,21 +1,29 @@
+# ROS imports
 import rclpy
-from threading import Thread
 from rclpy.node import Node
-import time
+from nav_msgs.msg import Odometry as Odom
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry as Odom
+from neato2_interfaces.msg import Bump
+
+# Computer vision imports
 import cv2 as cv
 from ultralytics import YOLO
-from .helpers import *
+from .sort import Sort
+
+# Misc.
+import time
+from threading import Thread
 import time
 import numpy as np
 import math
-from .sort import Sort
 from typing import Literal
 import random
-from neato2_interfaces.msg import Bump
+
+# Custom
+from .helpers import *
+
 
 
 States = Literal["wait", "turn_to", "scan_and_elim", "turn_away", "game_end"]
