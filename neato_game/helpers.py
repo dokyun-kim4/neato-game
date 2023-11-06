@@ -75,7 +75,7 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
 
     moving = False
 
-#-------------------------------- Implement Function-----------------------------------------------------------------------------#
+#--------------------------------Game Helpers----------------------------------------------------------------------------#
 
     # What will be considered "moving"?
 
@@ -109,39 +109,19 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
 
     return moving
     
-
-def getCOM(points: np.ndarray)->tuple:
-    """
-    Calculate center of mass given a list of points.
-
-    Args:
-        points (np.ndarray): list of points represented as a list
-
-    Returns:
-        com (tuple): xy coordinates for center of mass represented as a tuple
-    """
-    com = None
-    points_list = points.tolist()
-    for i,point in enumerate((points_list)):
-        if point[0] == 0 and point[1] == 0:
-            points_list.pop(i)
-    xsum = 0
-    ysum = 0
-    count = len(points_list)
-
-    for point in points_list:
-        xsum += point[0]
-        ysum += point[1]
-
-    com = (int(xsum//count),int(ysum//count))
-    return com
-
 def playerOut()->None:
     """
     Play a sound indicating that the player is out from the game
     """
-    playsound('playerOut.mp3')
+    playsound('audio/playerOut.mp3')
 
+def countdown() ->None:
+    """
+    Play sound indicating countdown before the neato turns towards the players
+    """
+    playsound('audio/countdown.mp3')
+
+#----------------------------------------- Neato helpers -------------------------------------------#
 def get_angle(q: Quaternion):
     """
     Get the yaw angle of a quaternion

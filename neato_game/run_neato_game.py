@@ -33,14 +33,13 @@ class neatoGame(Node):
         self.prev_people = None # This would be person_bboxes object
         self.prev_frame = None # This would be the previous image
         self.sort = Sort()
-        self.detect_movement = False
         self.initial_angle: float | None = None
         self.angle: float = 0.0
         self.bumped = False
 
-        self.crnt_frame =  None                        # the latest image from the camera
-        self.bridge = CvBridge()                    # used to convert ROS messages to OpenCV
-
+        self.crnt_frame =  None  # the latest image from the camera
+        self.bridge = CvBridge() # used to convert ROS messages to OpenCV
+        self.waitTime = 5 # countdown delay before turning towards players (sec)
         self.state: States
 
         self.create_subscription(Image, image_topic, self.process_image, 10)
@@ -190,7 +189,10 @@ class neatoGame(Node):
                     done_turning = self.turn_towards(0)
                     if done_turning:
                         self.state = "wait"
-                        target_time = time.time() + 3
+                        target_time = time.time() + self.waitTime
+                        t2 = Thread(target = countdown)
+                        t2.start()
+                        
                 case _:
                     break
 
@@ -202,13 +204,10 @@ class neatoGame(Node):
         # NOTE: only do cv2.imshow and cv2.waitKey in this function 
         if not self.crnt_frame is None:
             waitKey = cv.waitKey(1) & 0xFF
-            if waitKey == ord('w'):
-                self.detect_movement = not self.detect_movement
 
 if __name__ == '__main__':
     node = neatoGame("/camera/image_raw")
     node.run() # type: ignore
-
 
 def main(args=None):
     rclpy.init()
