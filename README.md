@@ -130,7 +130,7 @@ Finally, the image is opened to remove noise, which is an errosion followed by a
 
 Once we have the final difference, we find the amount of changed pixels in each player's bounding box. If this sum is greater than a certain number, then the player is considered to have moved.
 
-# Adding Game Features (neato_integration branch)
+# Adding Game Features [(neato_integration branch)](https://github.com/dokyun-kim4/neato_game/tree/neato-integration)
 
 In a real game of Red Light Green Light, there is one "traffic cop" who turns towards the players in random time intervals. When a player is caught moving while the traffic cop is facing the players, they are eliminated from the game. If a player manages to tap the traffic cop's shoulders without getting eliminated, game is finished.
 
