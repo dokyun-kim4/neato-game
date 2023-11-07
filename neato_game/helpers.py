@@ -42,6 +42,7 @@ def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes, prev
     prev_tracks: np.ndarray = prev_boxes.tracks
     crnt_tracks: np.ndarray  = crnt_boxes.tracks
 
+    print(len(prev_tracks),len(crnt_tracks))
     
     for i in range(len(prev_tracks)):
         if isMoving(prev_tracks[i],crnt_tracks[i], prev_img, crnt_img):
@@ -62,7 +63,7 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
         moving (bool): A boolean representing if a person moved between the two frames
     """
 #------------------------------- Declare Variables ----------------------------------------------------------------------------#
-    BBOX_MOVEMENT_THRESH = 5
+    BBOX_MOVEMENT_THRESH = 50
     IMAGE_DIFFERENCE_THRESH = 1000
     
     # Prev_box

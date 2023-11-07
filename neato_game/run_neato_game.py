@@ -49,6 +49,7 @@ class neatoGame(Node):
         self.bridge = CvBridge() # used to convert ROS messages to OpenCV
         self.waitTime = 5 # countdown delay before turning towards players (sec)
         self.state: States
+        self.initial_player_count = None
 
         self.create_subscription(Image, image_topic, self.process_image, 10)
         self.create_subscription(Odom,'odom', self.update_angle, 10)
@@ -84,30 +85,49 @@ class neatoGame(Node):
             self.prev_frame = self.crnt_frame.copy() # type: ignore
         self.crnt_frame = self.bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
 
-        # Feed frame into YOLO model
+        # # Feed frame into YOLO model
+        # results = self.model(self.crnt_frame,verbose=False)
+        # # Get results
+        # attr = results[0]
+        # boxes = attr.boxes.cpu().numpy()
+        # xyxys = boxes.xyxy
+        # confs = boxes.conf
+
+        # # Store all results as a `person_bboxes` object
+        # if self.crnt_people is not None:
+        #     self.prev_people = self.crnt_people
+        # self.crnt_people = person_bboxes(xyxys,confs,self.sort)
+        # self.crnt_people.update()
+
+    def scan_and_eliminate(self):
+        
+        #Feed frame into YOLO model
         results = self.model(self.crnt_frame,verbose=False)
         # Get results
         attr = results[0]
         boxes = attr.boxes.cpu().numpy()
         xyxys = boxes.xyxy
         confs = boxes.conf
-
         # Store all results as a `person_bboxes` object
         if self.crnt_people is not None:
             self.prev_people = self.crnt_people
         self.crnt_people = person_bboxes(xyxys,confs,self.sort)
         self.crnt_people.update()
 
-    def scan_and_eliminate(self):
-        ids = getMovedPeopleIDs(self.prev_people,self.crnt_people,self.prev_frame,self.crnt_frame) # type: ignore
-        for id in ids:
-            if id not in self.outHistory:
-                self.outHistory.append(id)
-                print(f"Person #{int(id)} has moved!")
-                # Robot will turn to person here
-                # Need a function to calculate where to turn to
-                t1 = Thread(target = playerOut)
-                t1.start()
+        if self.prev_people is not None:
+            if self.initial_player_count is None:
+                self.initial_player_count = len(self.prev_people.tracks)
+
+
+            ids = getMovedPeopleIDs(self.prev_people,self.crnt_people,self.prev_frame,self.crnt_frame) # type: ignore
+            for id in ids:
+                if id not in self.outHistory:
+                    self.outHistory.append(id)
+                    print(f"Person #{int(id)} has moved!")
+                    # Robot will turn to person here
+                    # Need a function to calculate where to turn to
+                    t1 = Thread(target = playerOut)
+                    t1.start()
 
         # Draw bounding box (SORT)
         bbox_frame = self.crnt_frame
@@ -174,10 +194,13 @@ class neatoGame(Node):
 
         self.state = "wait"
         target_time = time.time() + random.uniform(2, 5)
+        t2 = Thread(target = countdown)
+        t2.start()
+
 
         while True:
             
-            if self.bumped:
+            if self.bumped or (len(self.outHistory) == self.initial_player_count):
                 self.state = "game_end"
 
             match self.state:
@@ -189,6 +212,7 @@ class neatoGame(Node):
                     if done_turning:
                         self.state = "scan_and_elim"
                         target_time = time.time() + random.uniform(2, 5)
+                        
                 case "scan_and_elim":
                     self.scan_and_eliminate()
                     if time.time() > target_time:
