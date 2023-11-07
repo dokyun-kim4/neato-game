@@ -126,7 +126,7 @@ class neatoGame(Node):
                     print(f"Person #{int(id)} has moved!")
                     # Robot will turn to person here
                     # Need a function to calculate where to turn to
-                    t1 = Thread(target = playerOut)
+                    t1 = Thread(target = playerOut, args=(int(id),))
                     t1.start()
 
         # Draw bounding box (SORT)

@@ -1,6 +1,8 @@
 import numpy as np
 import math
 from playsound import playsound
+from gtts import gTTS
+from tempfile import NamedTemporaryFile
 from .sort import Sort
 from .image_difference import Diff
 import cv2 as cv
@@ -110,11 +112,18 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
 
     return moving
     
-def playerOut()->None:
+def playerOut(player_id: int)->None:
     """
     Play a sound indicating that the player is out from the game
     """
-    playsound('audio/playerOut.mp3')
+    playsound('audio/playerOut.mp3', block=False)
+
+    mytext = f'{player_id}번 탈락'
+    tts = gTTS(text=mytext, lang='ko')
+    tts_file = NamedTemporaryFile()
+    tts.write_to_fp(tts_file)
+
+    playsound(tts_file.name, block=False)
 
 def countdown() ->None:
     """
