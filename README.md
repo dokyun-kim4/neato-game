@@ -89,11 +89,8 @@ Identifying people and tracking their bounding boxes works well to detect some m
 To start, the absolute difference between two images is found:
 
 <p align="center">
-  <img src="img/frame1.png" style="width: 30%;" />
-  +
-  <img src="img/frame2.png" style="width: 30%;" />
-  ->
-  <img src="img/difference.png" style="width: 30%;" />
+  <img src="img/frames.gif" style="width: 40%;" />
+  <img src="img/difference.png" style="width: 40%;" />
 </p>
 
 *Fig 6: The `cv.absdiff()` between two consecutive frames of video*
@@ -101,9 +98,8 @@ To start, the absolute difference between two images is found:
 Then, the image is converted to grayscale if it isn't already. The reason this is done after the difference opperation is that it captures more of the difference. 
 
 <p align="center">
-  <img src="img/difference.png" style="width: 30%;" />
-  ->
-  <img src="img/gray.png" style="width: 30%;" />
+  <img src="img/difference.png" style="width: 40%;" />
+  <img src="img/gray.png" style="width: 40%;" />
 </p>
 
 *Fig 7: The `cv.cvtColor(_, cv.COLOR_BGR2GRAY)` of the difference of the frames*
@@ -111,9 +107,8 @@ Then, the image is converted to grayscale if it isn't already. The reason this i
 Once the image is grayscale, it is threshholded, making it a binary image composed of white pixels that changed and black pixels that did not. 
 
 <p align="center">
-  <img src="img/gray.png" style="width: 30%;" />
-  ->
-  <img src="img/filtered.png" style="width: 30%;" />
+  <img src="img/gray.png" style="width: 40%;" />
+  <img src="img/filtered.png" style="width: 40%;" />
 </p>
 
 *Fig 8: The `cv.threshold(_, threshold, 255, cv.THRESH_BINARY)` of the grayscale difference using the given threshhold*
@@ -121,9 +116,8 @@ Once the image is grayscale, it is threshholded, making it a binary image compos
 Finally, the image is opened to remove noise, which is an errosion followed by a dilation. This operation will remove small differences that are likely noise without significantly affecting the area of larger differences.    
 
 <p align="center">
-  <img src="img/filtered.png" style="width: 30%;" />
-  ->
-  <img src="img/opened.png" style="width: 30%;" />
+  <img src="img/filtered.png" style="width: 40%;" />
+  <img src="img/opened.png" style="width: 40%;" />
 </p>
 
 *Fig 9: The `cv.morphologyEx(_, cv.MORPH_OPEN, kernel)` of the threshholded difference using the given kernel*

@@ -1,7 +1,8 @@
 import numpy as np
 import cv2 as cv
+from PIL import Image 
 
-show = True
+show = False
 save = True 
 
 threshold = 15
@@ -35,6 +36,12 @@ if show:
     Show(frame2)
 if save:
     Save(frame2, "frame2")
+
+if save:
+    image1 = Image.fromarray(cv.cvtColor(frame1, cv.COLOR_BGR2RGB))
+    image2 = Image.fromarray(cv.cvtColor(frame2, cv.COLOR_BGR2RGB))
+
+    image1.save("img/frames.gif", format="GIF", append_images=[image2], save_all=True, duration=200, loop=0)
 
 difference = cv.absdiff(frame1, frame2)
 if show:
