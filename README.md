@@ -184,12 +184,32 @@ B -->|subscribes| E
 
 C -->|publishes| F
 ```
-*Fig 12: Node Diagram*
+*Fig 12: Node Diagram showing publishers and subscribers used in the program.*
 
 The `odometry` subscriber ensures the Neato is turning the correct amount every iteration. The `image` subcriber collects frames that are used for movement detection. The `cmd_vel` publisher ensures that the Neato turns at a desired angular velocity.
 
 # Demo Video
 [![Demo Video](img/demo_video.png)](http://www.youtube.com/watch?v=V822WxU7Jl8 "Neato Game Demo")
+
+# Challenges
+
+- Limitations of SORT
+  - ID assignment fails if person enters/leaves the frame
+- Computer vision is a difficult topic
+  - Had to read multiple research papers
+  - The concepts were difficult to grasp first time
+- Tuning the movement detection 
+  - Too sensitive or too lenient; hard to find the middleground
+
+# Project Reflection
+
+- Learned how to use GitHub branches
+  - Prevented merge errors
+- Built a solid understanding of the concepts behind YOLO and SORT.
+- If we had more time, we would have tried to implement the following:
+  - Neato turning to the person who moved before eliminating
+  - Reduce noise in images for better motion detection
+  - Explore other methods for detecting movement
 
 # Works Cited
 Bewley, Alex, et al. "Simple online and realtime tracking." 2016 IEEE international conference on image processing (ICIP). IEEE, 2016. 
