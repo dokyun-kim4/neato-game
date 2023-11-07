@@ -200,6 +200,8 @@ class neatoGame(Node):
 
         while True:
             
+            print(self.prev_people,self.crnt_people)
+
             if self.bumped or (len(self.outHistory) == self.initial_player_count):
                 self.state = "game_end"
 
@@ -212,11 +214,13 @@ class neatoGame(Node):
                     if done_turning:
                         self.state = "scan_and_elim"
                         target_time = time.time() + random.uniform(2, 5)
+                        time.sleep(0.3)
                         
                 case "scan_and_elim":
                     self.scan_and_eliminate()
                     if time.time() > target_time:
                         self.state = "turn_away"
+                        self.prev_people, self.crnt_people,self.prev_frame = None, None, None
                 case "turn_away":
                     done_turning = self.turn_towards(0)
                     if done_turning:

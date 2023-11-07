@@ -44,7 +44,6 @@ def getMovedPeopleIDs(prev_boxes: person_bboxes, crnt_boxes: person_bboxes, prev
     prev_tracks: np.ndarray = prev_boxes.tracks
     crnt_tracks: np.ndarray  = crnt_boxes.tracks
 
-    print(len(prev_tracks),len(crnt_tracks))
     
     for i in range(len(prev_tracks)):
         if isMoving(prev_tracks[i],crnt_tracks[i], prev_img, crnt_img):
@@ -65,7 +64,7 @@ def isMoving (prev_box_coord: np.ndarray,crnt_box_coord: np.ndarray, prev_img: n
         moving (bool): A boolean representing if a person moved between the two frames
     """
 #------------------------------- Declare Variables ----------------------------------------------------------------------------#
-    BBOX_MOVEMENT_THRESH = 50
+    BBOX_MOVEMENT_THRESH = 20
     IMAGE_DIFFERENCE_THRESH = 1000
     
     # Prev_box
@@ -116,14 +115,13 @@ def playerOut(player_id: int)->None:
     """
     Play a sound indicating that the player is out from the game
     """
-    playsound('audio/playerOut.mp3', block=False)
-
     mytext = f'{player_id}번 탈락'
     tts = gTTS(text=mytext, lang='ko')
     tts_file = NamedTemporaryFile()
     tts.write_to_fp(tts_file)
 
     playsound(tts_file.name, block=False)
+    playsound('audio/playerOut.mp3', block=False)
 
 def countdown() ->None:
     """
