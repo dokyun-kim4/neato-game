@@ -80,7 +80,11 @@ With this in mind, finding best-matching pairs using the distance matrix (Fig 3)
 
 Once SORT finishes all the steps described above, it moves onto the next frame after postprocessing. During postprocessing, the $b$ values (equation 1) of each target in $B_{predicted}$ gets updated depending on if they have been matched. For targets with a match, their $x,y,s,r$ is replaced with those of their matching pairs, and their $\dot{x}, \dot{y}, \dot{s}$ is updated using a [Kalman Filter](https://en.wikipedia.org/wiki/Kalman_filter). For targets without a match, their $x,y,s$ is updated by adding $\dot{x}, \dot{y}, \dot{s}$. For boxes in $B_{detected}$ without a match, they are considered new objects and their *b* values are initialized with $\dot{x}=0, \dot{y}=0, \dot{s}=0$. The new boxes are added to $B_{predicted}$.
 
-<!-- IMAGE FROM ACTUAL PROGRAM WITH BBOX IDS HERE -->
+<p>
+  <img src="img/SORT_demo.png" style="width: 50%;" />
+</p>
+
+*Fig 6: Result of applying SORT to an image. Each person is assigned to unique IDs. This ID will be used to determine which person moved.
 
 ## Image Substraction
 
@@ -93,7 +97,7 @@ To start, the absolute difference between two images is found:
   <img src="img/difference.png" style="width: 40%;" />
 </p>
 
-*Fig 6: The `cv.absdiff()` between two consecutive frames of video*
+*Fig 7: The `cv.absdiff()` between two consecutive frames of video*
 
 Then, the image is converted to grayscale if it isn't already. The reason this is done after the difference opperation is that it captures more of the difference. 
 
@@ -102,7 +106,7 @@ Then, the image is converted to grayscale if it isn't already. The reason this i
   <img src="img/gray.png" style="width: 40%;" />
 </p>
 
-*Fig 7: The `cv.cvtColor(_, cv.COLOR_BGR2GRAY)` of the difference of the frames*
+*Fig 8: The `cv.cvtColor(_, cv.COLOR_BGR2GRAY)` of the difference of the frames*
 
 Once the image is grayscale, it is threshholded, making it a binary image composed of white pixels that changed and black pixels that did not. 
 
@@ -111,7 +115,7 @@ Once the image is grayscale, it is threshholded, making it a binary image compos
   <img src="img/filtered.png" style="width: 40%;" />
 </p>
 
-*Fig 8: The `cv.threshold(_, threshold, 255, cv.THRESH_BINARY)` of the grayscale difference using the given threshhold*
+*Fig 9: The `cv.threshold(_, threshold, 255, cv.THRESH_BINARY)` of the grayscale difference using the given threshhold*
 
 Finally, the image is opened to remove noise, which is an errosion followed by a dilation. This operation will remove small differences that are likely noise without significantly affecting the area of larger differences.    
 
@@ -120,7 +124,7 @@ Finally, the image is opened to remove noise, which is an errosion followed by a
   <img src="img/opened.png" style="width: 40%;" />
 </p>
 
-*Fig 9: The `cv.morphologyEx(_, cv.MORPH_OPEN, kernel)` of the threshholded difference using the given kernel*
+*Fig 10: The `cv.morphologyEx(_, cv.MORPH_OPEN, kernel)` of the threshholded difference using the given kernel*
 
 Once we have the final difference, we find the amount of changed pixels in each player's bounding box. If this sum is greater than a certain number, then the player is considered to have moved.
 
@@ -135,16 +139,16 @@ A [Neato](https://neatorobotics.com/collections/robot-vacuums) will be the traff
 ```mermaid
 graph TD;
   F([init])
-  A([random_wait])
+  A([wait])
   B([turn_to])
   C([scan_and_elim])
   D([turn_away])
   E([game_end])
 
   F -->|initialize| A
-  A -->|finish timer| B
+  A -->|5 seconds| B
   B -->|finish turn| C
-  C -->|5 seconds| D
+  C -->|random time| D
   D -->|finish turn| A
 
   A-->|bumper triggered| E
@@ -152,7 +156,7 @@ graph TD;
   C-->|bumper triggered| E
   D-->|bumper triggered| E
 ```
-*Fig 10: State Diagram of Neato*
+*Fig 11: State Diagram of Neato*
 
 - `random_wait` state is when the Neato is waiting for a randomly selected time period before turning towards the players.   
 - `turn_to` state is when the Neato is turning towards the players.  
@@ -180,16 +184,17 @@ B -->|subscribes| E
 
 C -->|publishes| F
 ```
-*Fig 11: Node Diagram*
+*Fig 12: Node Diagram*
 
 The `odometry` subscriber ensures the Neato is turning the correct amount every iteration. The `image` subcriber collects frames that are used for movement detection. The `cmd_vel` publisher ensures that the Neato turns at a desired angular velocity.
 
-<!-- DEMO HERE? -->
+# Demo Video
+[![Demo Video](img/demo_video.png)](http://www.youtube.com/watch?v=V822WxU7Jl8 "Neato Game Demo")
 
 # Works Cited
-
 Bewley, Alex, et al. "Simple online and realtime tracking." 2016 IEEE international conference on image processing (ICIP). IEEE, 2016. 
 
 Oh, Il-Seok. Pattern Recognition, Computer Vision, and Machine Learning. Hanbit Academy, 2023.  
 
 Redmon, Joseph, et al. "You only look once: Unified, real-time object detection." Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.
+
