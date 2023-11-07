@@ -115,8 +115,8 @@ def playerOut(player_id: int)->None:
     """
     Play a sound indicating that the player is out from the game
     """
-    mytext = f'{player_id}번 탈락'
-    tts = gTTS(text=mytext, lang='ko')
+    mytext = f'Number {player_id} Eliminated'
+    tts = gTTS(text=mytext, lang='en')
     tts_file = NamedTemporaryFile()
     tts.write_to_fp(tts_file)
 
