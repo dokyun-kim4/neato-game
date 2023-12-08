@@ -15,7 +15,6 @@ from .sort import Sort
 # Misc.
 import time
 from threading import Thread
-import time
 import numpy as np
 import math
 from typing import Literal
