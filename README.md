@@ -84,7 +84,7 @@ Once SORT finishes all the steps described above, it moves onto the next frame a
   <img src="img/SORT_demo.png" style="width: 50%;" />
 </p>
 
-*Fig 6: Result of applying SORT to an image. Each person is assigned to unique IDs. This ID will be used to determine which person moved.
+*Fig 6: Result of applying SORT to an image. Each person is assigned to unique IDs. This ID will be used to determine which person moved.*
 
 ## Image Substraction
 
